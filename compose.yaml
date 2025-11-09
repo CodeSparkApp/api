@@ -1,0 +1,8 @@
+services:
+  codespark-backend:
+    container_name: codespark-backend
+    image: ghcr.io/codesparkapp/api:latest
+    ports:
+      - "8080:8080"
+    restart: always
+    env_file: stack.env
