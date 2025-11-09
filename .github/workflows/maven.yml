@@ -8,8 +8,7 @@ on:
   workflow_call:
 
 permissions:
-  contents: read
-  security-events: write
+  contents: write
 
 jobs:
   build:
