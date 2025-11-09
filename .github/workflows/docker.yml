@@ -10,12 +10,14 @@ env:
 
 jobs:
   maven-build:
+    permissions:
+      contents: write
     uses: ./.github/workflows/maven.yml
 
   docker-build-publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       packages: write
       attestations: write
       id-token: write
