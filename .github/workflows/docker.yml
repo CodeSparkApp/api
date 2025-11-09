@@ -52,7 +52,7 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
-          name: build-artifacts
+          name: codespark-backend
           path: staging/
 
       - name: Build and push Docker image
