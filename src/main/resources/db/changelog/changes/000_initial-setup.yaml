@@ -143,7 +143,7 @@ databaseChangeLog:
                   name: date
                   type: TIMESTAMP
                   constraints:
-                      nullable: false
+                    nullable: false
               - column:
                   name: account_id
                   type: UUID
