@@ -1,0 +1,633 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0
+      author: denniskp
+      comment: "Create initial database tables"
+      changes:
+        - createTable:
+            tableName: account
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: username
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: email
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: password
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: profile_image_url
+                  type: VARCHAR(512)
+              - column:
+                  name: verified
+                  type: BOOLEAN
+                  constraints:
+                    nullable: false
+              - column:
+                  name: role
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: false
+
+        - createTable:
+            tableName: conversation
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: account_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    unique: true
+        - addForeignKeyConstraint:
+            baseTableName: conversation
+            baseColumnNames: account_id
+            referencedTableName: account
+            referencedColumnNames: id
+            constraintName: fk_conversation_account
+
+        - createTable:
+            tableName: conversation_message
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: sender_type
+                  type: VARCHAR(32)
+              - column:
+                  name: message
+                  type: CLOB
+              - column:
+                  name: conversation_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: conversation_message
+            baseColumnNames: conversation_id
+            referencedTableName: conversation
+            referencedColumnNames: id
+            constraintName: fk_conversation_message_conversation
+
+        - createTable:
+            tableName: verification_token
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: token
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: type
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: expiry_date
+                  type: TIMESTAMP WITH TIME ZONE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: account_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: verification_token
+            baseColumnNames: account_id
+            referencedTableName: account
+            referencedColumnNames: id
+            constraintName: fk_verification_token_account
+
+        - createTable:
+            tableName: exam_date
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: date
+                  type: TIMESTAMP
+                  constraints:
+                      nullable: false
+              - column:
+                  name: account_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    unique: true
+        - addForeignKeyConstraint:
+            baseTableName: exam_date
+            baseColumnNames: account_id
+            referencedTableName: account
+            referencedColumnNames: id
+            constraintName: fk_exam_date_account
+
+        - createTable:
+            tableName: badge
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: description
+                  type: CLOB
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: icon
+                  type: VARCHAR(512)
+                  constraints:
+                    nullable: false
+
+        - createTable:
+            tableName: user_badge
+            columns:
+              - column:
+                  name: account_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: badge_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: receive_date
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            tableName: user_badge
+            columnNames: account_id, badge_id
+            constraintName: pk_user_badge
+
+        - addForeignKeyConstraint:
+            baseTableName: user_badge
+            baseColumnNames: account_id
+            referencedTableName: account
+            referencedColumnNames: id
+            constraintName: fk_user_badge_account
+
+        - addForeignKeyConstraint:
+            baseTableName: user_badge
+            baseColumnNames: badge_id
+            referencedTableName: badge
+            referencedColumnNames: id
+            constraintName: fk_user_badge_badge
+
+        - createTable:
+            tableName: chapter
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: title
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: CLOB
+                  constraints:
+                    nullable: false
+              - column:
+                  name: first_lesson_id
+                  type: UUID
+              - column:
+                  name: next_chapter_id
+                  type: UUID
+
+        - createTable:
+            tableName: lesson
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: title
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: CLOB
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: chapter_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: next_lesson_id
+                  type: UUID
+              - column:
+                  name: previous_lesson_id
+                  type: UUID
+
+        - addForeignKeyConstraint:
+            baseTableName: lesson
+            baseColumnNames: chapter_id
+            referencedTableName: chapter
+            referencedColumnNames: id
+            constraintName: fk_lesson_chapter
+
+        - addForeignKeyConstraint:
+            baseTableName: lesson
+            baseColumnNames: next_lesson_id
+            referencedTableName: lesson
+            referencedColumnNames: id
+            constraintName: fk_lesson_next_lesson
+
+        - addForeignKeyConstraint:
+            baseTableName: lesson
+            baseColumnNames: previous_lesson_id
+            referencedTableName: lesson
+            referencedColumnNames: id
+            constraintName: fk_lesson_previous_lesson
+
+        - addForeignKeyConstraint:
+            baseTableName: chapter
+            baseColumnNames: first_lesson_id
+            referencedTableName: lesson
+            referencedColumnNames: id
+            constraintName: fk_chapter_first_lesson
+
+        - addForeignKeyConstraint:
+            baseTableName: chapter
+            baseColumnNames: next_chapter_id
+            referencedTableName: chapter
+            referencedColumnNames: id
+            constraintName: fk_chapter_next_chapter
+
+        - createTable:
+            tableName: code_analysis_lesson
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: code
+                  type: CLOB
+                  constraints:
+                    nullable: false
+              - column:
+                  name: question
+                  type: CLOB
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sample_solution
+                  type: CLOB
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: code_analysis_lesson
+            baseColumnNames: id
+            referencedTableName: lesson
+            referencedColumnNames: id
+            constraintName: fk_code_analysis_lesson_parent
+
+        - createTable:
+            tableName: debugging_lesson
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: faulty_code
+                  type: CLOB
+                  constraints:
+                    nullable: false
+              - column:
+                  name: expected_output
+                  type: CLOB
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sample_solution
+                  type: CLOB
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: debugging_lesson
+            baseColumnNames: id
+            referencedTableName: lesson
+            referencedColumnNames: id
+            constraintName: fk_debugging_lesson_parent
+
+        - createTable:
+            tableName: fill_blanks_lesson
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: template_code
+                  type: CLOB
+                  constraints:
+                    nullable: false
+              - column:
+                  name: expected_output
+                  type: CLOB
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: fill_blanks_lesson
+            baseColumnNames: id
+            referencedTableName: lesson
+            referencedColumnNames: id
+            constraintName: fk_fill_blanks_lesson_parent
+
+        - createTable:
+            tableName: multiple_choice_lesson
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: question
+                  type: CLOB
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: multiple_choice_lesson
+            baseColumnNames: id
+            referencedTableName: lesson
+            referencedColumnNames: id
+            constraintName: fk_multiple_choice_lesson_parent
+
+        - createTable:
+            tableName: programming_lesson
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: problem
+                  type: CLOB
+                  constraints:
+                    nullable: false
+              - column:
+                  name: code
+                  type: CLOB
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sample_solution
+                  type: CLOB
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: programming_lesson
+            baseColumnNames: id
+            referencedTableName: lesson
+            referencedColumnNames: id
+            constraintName: fk_programming_lesson_parent
+
+        - createTable:
+            tableName: theory_lesson
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: text
+                  type: CLOB
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: theory_lesson
+            baseColumnNames: id
+            referencedTableName: lesson
+            referencedColumnNames: id
+            constraintName: fk_theory_lesson_parent
+
+        - createTable:
+            tableName: fill_blanks_lesson_solutions
+            columns:
+              - column:
+                  name: lesson_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: solution_index
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: solution
+                  type: CLOB
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            tableName: fill_blanks_lesson_solutions
+            columnNames: lesson_id, solution_index
+            constraintName: pk_fill_blanks_lesson_solutions
+        - addForeignKeyConstraint:
+            baseTableName: fill_blanks_lesson_solutions
+            baseColumnNames: lesson_id
+            referencedTableName: fill_blanks_lesson
+            referencedColumnNames: id
+            constraintName: fk_fill_blanks_solutions_lesson
+
+        - createTable:
+            tableName: multiple_choice_lesson_options
+            columns:
+              - column:
+                  name: lesson_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: options_index
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: option
+                  type: VARCHAR(512)
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            tableName: multiple_choice_lesson_options
+            columnNames: lesson_id, options_index
+            constraintName: pk_multiple_choice_lesson_options
+        - addForeignKeyConstraint:
+            baseTableName: multiple_choice_lesson_options
+            baseColumnNames: lesson_id
+            referencedTableName: multiple_choice_lesson
+            referencedColumnNames: id
+            constraintName: fk_multiple_choice_options_lesson
+
+        - createTable:
+            tableName: multiple_choice_lesson_solutions
+            columns:
+              - column:
+                  name: lesson_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: solution_index
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: solution
+                  type: INT
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            tableName: multiple_choice_lesson_solutions
+            columnNames: lesson_id, solution_index
+            constraintName: pk_multiple_choice_lesson_solutions
+        - addForeignKeyConstraint:
+            baseTableName: multiple_choice_lesson_solutions
+            baseColumnNames: lesson_id
+            referencedTableName: multiple_choice_lesson
+            referencedColumnNames: id
+            constraintName: fk_multiple_choice_solutions_lesson
+
+        - createTable:
+            tableName: user_lesson_progress
+            columns:
+              - column:
+                  name: account_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: lesson_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: state
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+
+        - addPrimaryKey:
+            tableName: user_lesson_progress
+            columnNames: account_id, lesson_id
+            constraintName: pk_user_lesson_progress
+
+        - addForeignKeyConstraint:
+            baseTableName: user_lesson_progress
+            baseColumnNames: account_id
+            referencedTableName: account
+            referencedColumnNames: id
+            constraintName: fk_user_lesson_progress_account
+
+        - addForeignKeyConstraint:
+            baseTableName: user_lesson_progress
+            baseColumnNames: lesson_id
+            referencedTableName: lesson
+            referencedColumnNames: id
+            constraintName: fk_user_lesson_progress_lesson
+
+        - createView:
+            viewName: chapter_progress_view
+            replaceIfExists: true
+            fullDefinition: true
+            selectQuery: |
+              SELECT
+                  c.id AS chapter_id,
+                  ul.account_id,
+                  COALESCE(
+                      (COUNT(
+                          CASE WHEN ul.state = 'SOLVED' THEN 1 END
+                      )::NUMERIC / NULLIF(
+                          (SELECT COUNT(*) FROM lesson l2 WHERE l2.chapter_id = c.id), 0
+                      )::NUMERIC),
+                      0
+                  ) AS progress
+              FROM
+                  chapter c
+                  JOIN lesson l ON l.chapter_id = c.id
+                  JOIN user_lesson_progress ul ON ul.lesson_id = l.id
+              GROUP BY
+                  c.id, ul.account_id;
