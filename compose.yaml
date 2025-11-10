@@ -6,3 +6,15 @@ services:
       - "8080:8080"
     restart: always
     env_file: stack.env
+    depends_on:
+        - codespark-db
+
+  codespark-db:
+    image: postgres:17-alpine
+    container_name: codespark-db
+    ports:
+      - "5432:5432"
+    restart: always
+    env_file: stack.env
+    volumes:
+      - /srv/codespark_db:/var/lib/postgresql/data
