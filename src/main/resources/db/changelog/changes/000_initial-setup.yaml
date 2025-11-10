@@ -612,7 +612,6 @@ databaseChangeLog:
         - createView:
             viewName: chapter_progress_view
             replaceIfExists: true
-            fullDefinition: true
             selectQuery: |
               SELECT
                   c.id AS chapter_id,
